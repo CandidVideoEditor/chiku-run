@@ -8,13 +8,13 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Play Run Chiku Run: jump, slide and dash through candy worlds, grab coins, dodge elemental monsters and unleash Super Chiku power-ups.",
+          "Play Run Chiku Run: jump through candy worlds, grab coins, dodge elemental monsters and unleash the 15-second Super Chiku power-up.",
       },
       { property: "og:title", content: "Run Chiku Run — Candy Endless Runner Game" },
       {
         property: "og:description",
         content:
-          "Jump, slide and dash through candy worlds. Collect coins, dodge monsters and go Super Chiku in this browser endless runner.",
+          "Jump through candy worlds. Collect coins, dodge monsters and go Super Chiku in this browser endless runner.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -33,12 +33,9 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   return (
-    <main className="min-h-screen bg-plum px-3 py-5 sm:px-6 sm:py-8">
+    <main className="h-[100dvh] w-screen overflow-hidden bg-plum">
       <h1 className="sr-only">Run Chiku Run — candy endless runner game</h1>
       <RunChikuGame />
-      <p className="mx-auto mt-4 max-w-[1200px] text-center text-sm text-cream/70">
-        Space / ↑ / tap to jump · double tap for double jump · ↓ or swipe down to slide · P to pause
-      </p>
     </main>
   );
 }
