@@ -49,6 +49,11 @@ import dButterfly1 from "@/assets/d_butterfly1.png.asset.json";
 import dButterfly2 from "@/assets/d_butterfly2.png.asset.json";
 import dWind from "@/assets/d_wind.png.asset.json";
 
+// Game-over clip. Drop `cry_chiku.mp4` in the uploads, create its asset pointer,
+// import it above and set this to that url — the Game Over screen picks it up
+// automatically. Until then it falls back to the lollipop art.
+export const CRY_VIDEO: string | null = null;
+
 export const VIDEOS = {
   run: runVideo.url,
   jump: jumpVideo.url,

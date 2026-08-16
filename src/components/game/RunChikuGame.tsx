@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { loadSprites, UI, VIDEOS } from "@/lib/game/assets";
+import { CRY_VIDEO, loadSprites, UI, VIDEOS } from "@/lib/game/assets";
 import { ChikuGame, type GameStatus } from "@/lib/game/engine";
 
 const EMPTY: GameStatus = {
@@ -81,9 +81,6 @@ export function RunChikuGame() {
         e.preventDefault();
         if (screen === "menu" || screen === "over") start();
         else game.jump();
-      } else if (e.code === "ArrowDown" || e.code === "KeyS") {
-        e.preventDefault();
-        game.slide();
       } else if (e.code === "KeyP" || e.code === "Escape") {
         togglePause();
       }
@@ -92,16 +89,13 @@ export function RunChikuGame() {
     return () => window.removeEventListener("keydown", onKey);
   }, [screen, start, togglePause]);
 
-  // touch: tap to jump, swipe down to slide
-  const touchY = useRef(0);
+  // touch: tap anywhere to jump
   const onTouchStart = (e: React.TouchEvent) => {
-    touchY.current = e.touches[0]?.clientY ?? 0;
-  };
-  const onTouchEnd = (e: React.TouchEvent) => {
-    const end = e.changedTouches[0]?.clientY ?? 0;
-    if (screen !== "playing") return;
-    if (end - touchY.current > 50) gameRef.current?.slide();
-    else gameRef.current?.jump();
+    if (screen === "menu" || screen === "over") {
+      start();
+      return;
+    }
+    if (screen === "playing") gameRef.current?.jump();
   };
 
   const timerChips = [
@@ -113,9 +107,8 @@ export function RunChikuGame() {
 
   return (
     <div
-      className="relative mx-auto aspect-[16/9] w-full max-w-[1200px] overflow-hidden rounded-3xl border-4 border-candy shadow-candy"
+      className="fixed inset-0 h-[100dvh] w-screen overflow-hidden bg-plum"
       onTouchStart={onTouchStart}
-      onTouchEnd={onTouchEnd}
     >
       <video
         className="absolute inset-0 h-full w-full object-cover"
@@ -127,6 +120,13 @@ export function RunChikuGame() {
       />
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-plum/40" />
       <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
+
+      {/* Heading: rendered exactly once, fixed at top-center, never scrolls */}
+      <img
+        src={UI.heading}
+        alt="Run Chiku Run"
+        className="pointer-events-none absolute left-1/2 top-2 z-30 w-[46vw] max-w-[520px] min-w-[220px] -translate-x-1/2 drop-shadow-2xl sm:top-4"
+      />
 
       {/* HUD */}
       {(screen === "playing" || screen === "paused") && (
@@ -190,21 +190,19 @@ export function RunChikuGame() {
       )}
 
       {screen === "menu" && (
-        <div className="overlay gap-5 text-center">
-          <img src={UI.heading} alt="Run Chiku Run" className="w-[74%] max-w-[620px] drop-shadow-2xl" />
+        <div className="overlay gap-5 pt-[26vh] text-center">
           <button onClick={start} className="btn-candy text-xl">
             Start Running
           </button>
           <p className="max-w-md text-sm text-cream/90">
-            <b>Space / ↑ / tap</b> to jump (double jump!) · <b>↓ / swipe down</b> to slide ·{" "}
-            <b>P</b> to pause
+            <b>Space / ↑ / tap</b> to jump · <b>P</b> to pause
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             {[
               { icon: UI.shield, text: "Shield" },
               { icon: UI.x3, text: "3x Score" },
               { icon: UI.slow, text: "Slow 15s" },
-              { icon: UI.lollypop, text: "Super Chiku" },
+              { icon: UI.lollypop, text: "Super Chiku 15s" },
             ].map((p) => (
               <div key={p.text} className="hud-panel">
                 <img src={p.icon} alt="" className="h-6 w-6" />
@@ -226,8 +224,19 @@ export function RunChikuGame() {
       )}
 
       {screen === "over" && (
-        <div className="overlay gap-4 text-center">
-          <img src={UI.lollypop} alt="" className="h-24 w-24 animate-bounce" />
+        <div className="overlay gap-4 pt-[22vh] text-center">
+          {CRY_VIDEO ? (
+            <video
+              src={CRY_VIDEO}
+              className="h-40 w-40 rounded-full object-cover mix-blend-screen"
+              autoPlay
+              muted
+              loop
+              playsInline
+            />
+          ) : (
+            <img src={UI.lollypop} alt="" className="h-24 w-24 animate-bounce" />
+          )}
           <h2 className="font-display text-4xl text-cream">Chiku tripped!</h2>
           <div className="flex gap-3">
             <div className="hud-panel flex-col items-center">

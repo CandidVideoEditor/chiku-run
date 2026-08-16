@@ -123,8 +123,6 @@ export class ChikuGame {
   private playerY = 0;
   private vy = 0;
   private jumps = 0;
-  private sliding = false;
-  private slideTime = 0;
   private groundedTime = 0;
 
   private runner: VideoSprite;
@@ -182,7 +180,7 @@ export class ChikuGame {
   }
 
   private playerBox() {
-    const h = this.playerH * (this.sliding ? 0.55 : 1);
+    const h = this.playerH;
     const w = h * 0.78;
     const y = this.groundY - h - this.playerY;
     return { x: this.playerX - w / 2, y, w, h };
@@ -233,7 +231,6 @@ export class ChikuGame {
     this.playerY = 0;
     this.vy = 0;
     this.jumps = 0;
-    this.sliding = false;
     this.over = false;
     this.paused = false;
     this.running = true;
@@ -279,23 +276,13 @@ export class ChikuGame {
 
   jump() {
     if (!this.running || this.paused || this.over) return;
-    const maxJumps = 2;
-    if (this.jumps < maxJumps) {
-      this.jumps++;
-      this.vy = this.jumps === 1 ? -this.h * 1.45 : -this.h * 1.2;
-      this.sliding = false;
+    // single jump only — no double jump
+    if (this.jumps === 0 && this.playerY <= 1) {
+      this.jumps = 1;
+      this.vy = -this.h * 1.5;
       this.jumper.reset();
       this.burst(this.playerX, this.groundY - 8, 10, 48);
     }
-  }
-
-  slide() {
-    if (!this.running || this.paused || this.over) return;
-    if (this.playerY > 4) {
-      this.vy = this.h * 2.2; // fast fall into a slide
-    }
-    this.sliding = true;
-    this.slideTime = 0.65;
   }
 
   /* ------------------------------------------------------------------ loop */
@@ -320,10 +307,6 @@ export class ChikuGame {
       if (this.timers[key] > 0) this.timers[key] = Math.max(0, this.timers[key] - dt);
     }
     if (this.invuln > 0) this.invuln -= dt;
-    if (this.slideTime > 0) {
-      this.slideTime -= dt;
-      if (this.slideTime <= 0) this.sliding = false;
-    }
 
     // physics
     this.vy += this.h * 4.6 * dt;
@@ -339,7 +322,7 @@ export class ChikuGame {
     }
 
     // score
-    this.score += (move * 0.05 + dt * 6) * (this.timers.x3 > 0 ? 3 : 1);
+    this.score += (move * 0.05 + dt * 6) * (this.timers.x3 > 0 || this.timers.super > 0 ? 3 : 1);
 
     // spawning
     this.sinceSpawn += move;
@@ -517,7 +500,7 @@ export class ChikuGame {
   private resolveHit(e: Entity) {
     if (e.kind === "coin") {
       e.dead = true;
-      const gained = e.value * (this.timers.x3 > 0 ? 3 : 1) * this.combo;
+      const gained = e.value * (this.timers.x3 > 0 || this.timers.super > 0 ? 3 : 1) * this.combo;
       this.coins += e.value;
       this.score += gained * 10;
       this.combo = Math.min(8, this.combo + (e.sprite === "chest" ? 2 : 0.25));
@@ -570,14 +553,14 @@ export class ChikuGame {
       x3: "3X SCORE!",
       slow: "SLOW 15s",
       life: "+1 LIFE",
-      super: "SUPER!",
+      super: "SUPER CHIKU 15s!",
     };
     if (power === "life") this.lives = Math.min(5, this.lives + 1);
     if (power === "shield") this.timers.shield = 10;
     if (power === "x3") this.timers.x3 = 10;
     if (power === "slow") this.timers.slow = 15;
     if (power === "super") {
-      this.timers.super = 8;
+      this.timers.super = 15;
       this.hero.reset();
     }
     this.flashTime = 0.3;
@@ -786,11 +769,10 @@ export class ChikuGame {
     ctx.save();
     if (this.invuln > 0) ctx.globalAlpha = 0.4 + Math.abs(Math.sin(performance.now() / 70)) * 0.6;
     if (frame) {
-      const scale = box.h / (this.sliding ? 1 : 1) / frame.height;
-      const dw = frame.width * scale * (this.sliding ? 1.25 : 1);
+      const scale = box.h / frame.height;
+      const dw = frame.width * scale;
       const dh = box.h;
       ctx.translate(this.playerX, box.y + dh / 2);
-      if (this.sliding) ctx.rotate(-0.35);
       ctx.drawImage(frame, -dw / 2, -dh / 2, dw, dh);
     } else {
       ctx.fillStyle = "rgba(255, 138, 199, 0.9)";
