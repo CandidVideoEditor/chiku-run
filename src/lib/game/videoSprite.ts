@@ -66,7 +66,7 @@ export class VideoSprite {
       const data = this.bctx.getImageData(0, 0, w, h);
       const px = data.data;
       for (let i = 0; i < px.length; i += 4) {
-        const lum = Math.max(px[i], px[i + 1], px[i + 2]);
+        const lum = Math.max(px[i] ?? 0, px[i + 1] ?? 0, px[i + 2] ?? 0);
         if (lum <= 26) {
           px[i + 3] = 0;
         } else if (lum < 74) {
