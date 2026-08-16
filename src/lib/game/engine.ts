@@ -769,11 +769,10 @@ export class ChikuGame {
     ctx.save();
     if (this.invuln > 0) ctx.globalAlpha = 0.4 + Math.abs(Math.sin(performance.now() / 70)) * 0.6;
     if (frame) {
-      const scale = box.h / (this.sliding ? 1 : 1) / frame.height;
-      const dw = frame.width * scale * (this.sliding ? 1.25 : 1);
+      const scale = box.h / frame.height;
+      const dw = frame.width * scale;
       const dh = box.h;
       ctx.translate(this.playerX, box.y + dh / 2);
-      if (this.sliding) ctx.rotate(-0.35);
       ctx.drawImage(frame, -dw / 2, -dh / 2, dw, dh);
     } else {
       ctx.fillStyle = "rgba(255, 138, 199, 0.9)";
