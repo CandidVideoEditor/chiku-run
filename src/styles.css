@@ -142,3 +142,75 @@
     color: var(--color-foreground);
   }
 }
+
+/* ---------------------------------------------- RUN CHIKU RUN design system */
+@theme inline {
+  --color-candy: var(--candy);
+  --color-plum: var(--plum);
+  --color-gold: var(--gold);
+  --color-cream: var(--cream);
+  --font-display: "Baloo 2", system-ui, sans-serif;
+  --font-body: "Nunito", system-ui, sans-serif;
+  --shadow-candy: 0 18px 50px -12px oklch(0.45 0.19 348 / 0.6);
+}
+
+:root {
+  --candy: oklch(0.72 0.19 350);
+  --plum: oklch(0.32 0.14 330);
+  --gold: oklch(0.85 0.15 88);
+  --cream: oklch(0.98 0.02 90);
+}
+
+@layer components {
+  .btn-candy {
+    border-radius: 9999px;
+    padding: 0.7rem 1.8rem;
+    font-family: var(--font-display);
+    font-weight: 800;
+    color: var(--cream);
+    background-image: linear-gradient(160deg, var(--candy), var(--plum));
+    border: 3px solid var(--cream);
+    box-shadow: var(--shadow-candy);
+    transition: transform 0.15s ease, filter 0.15s ease;
+  }
+  .btn-candy:hover {
+    transform: translateY(-2px) scale(1.03);
+    filter: brightness(1.08);
+  }
+  .hud-panel {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    border-radius: 9999px;
+    padding: 0.3rem 0.8rem;
+    background: color-mix(in oklch, var(--plum) 72%, transparent);
+    border: 2px solid color-mix(in oklch, var(--cream) 55%, transparent);
+    backdrop-filter: blur(6px);
+  }
+  .hud-label {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.8rem;
+    color: var(--cream);
+    letter-spacing: 0.02em;
+  }
+  .hud-value {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 1.25rem;
+    line-height: 1.1;
+    color: var(--gold);
+  }
+  .overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    background: color-mix(in oklch, var(--plum) 68%, transparent);
+    backdrop-filter: blur(4px);
+    font-family: var(--font-body);
+  }
+}
